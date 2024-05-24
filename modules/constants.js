@@ -50,13 +50,6 @@ export const CELL_SIZE = {
 };
 
 /**
- * Shows information that helps developing and testing.
- *
- * @type {boolean}
- */
-export const DEBUG = true;
-
-/**
  * Maximum amount of mines that minesweeper grid should have.
  *
  * @type {number}
@@ -82,7 +75,7 @@ export const SYMBOLS = {
 export function getMouseClickPosition(e) {
 	const rect = canvas.getBoundingClientRect();
 	return { x: e.clientX - rect.left, y: e.clientY - rect.top };
-};
+}
 
 /**
  * Updates `h1` element innerText.
@@ -99,8 +92,8 @@ export function updateStatsText(time, mines, state = null) {
 
 	text += `  |  ${state ? "GAME WON!" : "GAME LOST!"}`;
 	stats.innerText = text;
-};
+}
 
 export function updateDebugText(text) {
 	debugTxt.innerText = text;
-};
+}

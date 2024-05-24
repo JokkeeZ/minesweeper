@@ -14,13 +14,25 @@
 			* {
 				background-color: #333333;
 				font-family: "Roboto", sans-serif;
-				margin: 0;
+			}
+
+			canvas {
+				border-left: 2px solid black;
+				border-top: 2px solid black;
+				border-right: 4px solid black;
+				border-bottom: 4px solid black;
+			}
+			canvas:focus-visible {
+				outline: none;
+			}
+			h1 {
+				color: #fdfdfd;
 			}
 		</style>
 	</head>
 	<body>
-		<canvas id="game" style="border: 1px solid black"></canvas>
-
+		<canvas id="game" tabindex="1"></canvas>
+		<
 		<h1 id="stats">-</h1>
 		<h1 id="debug"></h1>
 

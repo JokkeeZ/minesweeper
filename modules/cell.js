@@ -1,4 +1,4 @@
-import { CELL_SIZE, ROW_COLS, SYMBOLS, ctx, DEBUG } from "./constants.js";
+import { CELL_SIZE, ROW_COLS, SYMBOLS, ctx } from "./constants.js";
 
 /**
  * Represents a cell in the minesweeper grid.
@@ -60,9 +60,9 @@ export class Cell {
 	}
 
 	/**
-	 * Gets a color that represents this cell.
+	 * Gets the cell foreground color.
 	 *
-	 * @returns {string} Returns color that represents cell's value.
+	 * @returns {string} Returns cell foreground color.
 	 */
 	getColor() {
 		if (this.value == 1) {
@@ -76,8 +76,13 @@ export class Cell {
 		}
 	}
 
+	/**
+	 * Gets the cell background color.
+	 *
+	 * @returns Returns cell background color.
+	 */
 	getBgColor() {
-		if (this.opened) {
+		if (this.opened && !this.mine) {
 			return "lightgray";
 		} else {
 			return "#333333";
@@ -85,7 +90,7 @@ export class Cell {
 	}
 
 	/**
-	 * Gets all neighbours that surround this cell.
+	 * Gets all neighbours that surround the cell.
 	 *
 	 * @param {Cell[]} cells All grid cells.
 	 * @returns {Cell[]} Neighbour cells.
@@ -143,22 +148,17 @@ export class Cell {
 	}
 
 	/**
-	 * Draws this cell.
+	 * Draws the cell and it's symbol or text, if it has any.
 	 */
 	draw() {
 		ctx.fillStyle = this.getBgColor();
 
 		ctx.fillRect(this.bounds.x, this.bounds.y, CELL_SIZE.w, CELL_SIZE.h);
 		ctx.stroke();
-	}
-
-	globalDraw() {
-		this.draw();
 
 		if (this.value > 0 && this.opened) {
 			this.drawText(this.value);
 		} else if (this.mine && this.opened) {
-			this.draw();
 			this.drawText(SYMBOLS.MINE);
 		} else if (this.isMarked) {
 			this.drawText(SYMBOLS.MARK);
@@ -166,40 +166,8 @@ export class Cell {
 	}
 
 	/**
-	 * Draws this cell and marker on it,
-	 * incase it's marked or removes the marker.
-	 */
-	drawMarker() {
-		this.draw();
-
-		if (this.isMarked) {
-			this.drawText(SYMBOLS.MARK);
-		}
-	}
-
-	/**
-	 * Draws this cell and it's value.
-	 */
-	drawNormal() {
-		this.draw();
-
-		if (this.value > 0) {
-			this.drawText(this.value);
-		}
-	}
-
-	/**
-	 * Draws this cell and mine on it, if it has a mine.
-	 */
-	drawMine() {
-		if (this.mine) {
-			this.draw();
-			this.drawText(SYMBOLS.MINE);
-		}
-	}
-
-	/**
-	 * Draws text on center of this cell.
+	 * Draws text on center of the cell.
+	 *
 	 * @param {*} text Text to be drawn.
 	 */
 	drawText(text) {
@@ -211,4 +179,4 @@ export class Cell {
 
 		ctx.fillText(text, textPosition.x, textPosition.y);
 	}
-};
+}

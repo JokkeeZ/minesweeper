@@ -123,7 +123,7 @@ export class Game {
 	 */
 	drawGrid() {
 		ctx.lineWidth = 4;
-		ctx.strokeStyle = 'black';
+		ctx.strokeStyle = "black";
 
 		const cells = (MAP_SIZE.h / CELL_SIZE.h) * (MAP_SIZE.w / CELL_SIZE.w);
 		for (let i = 0; i < cells; ++i) {
@@ -152,7 +152,8 @@ export class Game {
 		}
 
 		cell.opened = true;
-		cell.drawNormal();
+		// cell.drawNormal();
+		cell.draw();
 
 		if (cell.value != 0) {
 			return;
@@ -185,7 +186,11 @@ export class Game {
 	 */
 	drawAllMines() {
 		for (let i = 0; i < this.cells.length; ++i) {
-			this.cells[i].drawMine();
+			if (this.cells[i].mine) {
+				this.cells[i].opened = true;
+			}
+
+			this.cells[i].draw();
 		}
 	}
 
@@ -210,4 +215,4 @@ export class Game {
 	findCellAtPosition(x, y) {
 		return this.cells.find((c) => c.intersects(x, y));
 	}
-};
+}

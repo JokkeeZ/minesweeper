@@ -2,6 +2,7 @@ import * as constants from "./constants.js";
 import { Game } from "./game.js";
 
 const game = new Game();
+let helpMode = false;
 
 /**
  * @param {MouseEvent} e Event that occurred when
@@ -23,8 +24,8 @@ function canvasOnClick(e) {
 	if (!game.started) {
 		game.initializeStartingCell(cell);
 
-		if (constants.DEBUG) {
-			// game.drawAllMines();
+		if (helpMode) {
+			game.drawAllMines();
 		}
 	}
 
@@ -58,14 +59,14 @@ function canvasOnContextMenu(e) {
 	}
 
 	cell.isMarked = !cell.isMarked;
-	cell.drawMarker();
+	cell.draw();
 	game.mines = cell.isMarked ? game.mines - 1 : game.mines + 1;
 }
 
 /** @type {Cell[]} */
-let latest = [];
+let latestCellHover = [];
 function canvasOnMouseMove(e) {
-	if (!game.started || game.allMinesFound() || game.lost) {
+	if (!helpMode || !game.started || game.allMinesFound() || game.lost) {
 		return;
 	}
 
@@ -76,34 +77,51 @@ function canvasOnMouseMove(e) {
 		return;
 	}
 
-	constants.updateDebugText(`X: ${cell.pos.x} Y: ${cell.pos.y}`);
-
-	const neighbours = cell.getNeighbours(game.cells);
+	if (helpMode) {
+		constants.updateDebugText(`X: ${cell.pos.x} Y: ${cell.pos.y}`);
+	}
 
 	constants.ctx.save();
 
-	if (latest != null) {
+	if (latestCellHover != null) {
 		constants.ctx.lineWidth = 4;
 		constants.ctx.strokeStyle = "black";
 
-		for (let i = 0; i < latest.length; ++i) {
-			if (latest[i].opened) continue;
-			latest[i].globalDraw();
+		for (let i = 0; i < latestCellHover.length; ++i) {
+			if (!latestCellHover[i].opened) {
+				latestCellHover[i].draw();
+			}
 		}
 	}
 
-	latest = neighbours;
+	latestCellHover = cell.getNeighbours(game.cells);
 
 	constants.ctx.lineWidth = 2;
 	constants.ctx.strokeStyle = "yellow";
 
-	for (let i = 0; i < latest.length; ++i) {
-		const c = latest[i];
-		if (c.opened) continue;
-		constants.ctx.strokeRect(c.bounds.x, c.bounds.y, constants.CELL_SIZE.w, constants.CELL_SIZE.h);
+	for (let i = 0; i < latestCellHover.length; ++i) {
+		if (!latestCellHover[i].opened) {
+			constants.ctx.setLineDash([6]);
+			constants.ctx.strokeRect(
+				latestCellHover[i].bounds.x,
+				latestCellHover[i].bounds.y,
+				constants.CELL_SIZE.w,
+				constants.CELL_SIZE.h
+			);
+		}
 	}
 
 	constants.ctx.restore();
+}
+
+/**
+ *
+ * @param {KeyboardEvent} e
+ */
+function canvasOnKeyPress(e) {
+	if (e.key == "h") {
+		helpMode = !helpMode;
+	}
 }
 
 /**
@@ -115,6 +133,7 @@ function canvasOnMouseMove(e) {
 		constants.canvas.addEventListener("contextmenu", canvasOnContextMenu);
 		constants.canvas.addEventListener("click", canvasOnClick);
 		constants.canvas.addEventListener("mousemove", canvasOnMouseMove);
+		constants.canvas.addEventListener("keypress", canvasOnKeyPress);
 	}
 
 	if (!game.started) {
@@ -122,8 +141,9 @@ function canvasOnMouseMove(e) {
 	}
 
 	const now = new Date();
-	const elapsedSeconds =
-		Math.floor((now.getTime() - game.timer.getTime()) / 1000);
+	const elapsedSeconds = Math.floor(
+		(now.getTime() - game.timer.getTime()) / 1000
+	);
 
 	if (game.allMinesFound()) {
 		constants.updateStatsText(elapsedSeconds, game.mines, true);
